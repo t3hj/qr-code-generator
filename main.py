@@ -1,5 +1,7 @@
 import qrcode
 from PIL import Image, ImageDraw, ImageFont
+import tkinter as tk
+from tkinter import filedialog, messagebox, colorchooser, ttk
 
 def create_qr_code(url, filename='qr_code.png', box_size=10, border=4, fill_color='black', back_color='white', version=1, error_correction='L', logo_path=None, output_format='PNG', frame_text=None):
     try:
@@ -64,36 +66,98 @@ def create_qr_code(url, filename='qr_code.png', box_size=10, border=4, fill_colo
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def main():
-    print("Welcome to the QR Code Generator!")
+def generate_qr_code():
+    url = url_entry.get().strip()
+    if not url:
+        messagebox.showerror("Input Error", "URL cannot be empty.")
+        return
     
-    # Prompt for URL
-    url = input("Enter the URL to encode in the QR code: ")
+    fill_color = fill_color_entry.get().strip() or 'black'
+    back_color = back_color_entry.get().strip() or 'white'
+    filename = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("All files", "*.*")])
+    if not filename:
+        return
+    version = int(version_entry.get().strip() or 1)
+    error_correction = error_correction_entry.get().strip().upper() or 'L'
+    logo_path = logo_path_entry.get().strip() or None
+    output_format = output_format_entry.get().strip().upper() or 'PNG'
     
-    # Prompt for colors
-    fill_color = input("Enter the fill color (default is black): ") or 'black'
-    back_color = input("Enter the background color (default is white): ") or 'white'
+    # Ensure default format is 'PNG' if not specified
+    if not output_format:
+        output_format = 'PNG'
     
-    # Prompt for filename
-    filename = input("Enter the filename to save the QR code image (default is qr_code.png): ") or 'qr_code.png'
+    frame_text = frame_text_entry.get().strip() or None
     
-    # Prompt for version
-    version = int(input("Enter the QR code version (1-40, default is 1): ") or 1)
-    
-    # Prompt for error correction level
-    error_correction = input("Enter the error correction level (L, M, Q, H, default is L): ") or 'L'
-    
-    # Prompt for logo path
-    logo_path = input("Enter the path to a logo image (optional): ") or None
-    
-    # Prompt for output format
-    output_format = input("Enter the output format (PNG, JPEG, etc., default is PNG): ") or 'PNG'
-    
-    # Prompt for frame text
-    frame_text = input("Enter the text to display on the frame (optional): ") or None
-    
-    # Generate the QR code
     create_qr_code(url, filename, fill_color=fill_color, back_color=back_color, version=version, error_correction=error_correction, logo_path=logo_path, output_format=output_format, frame_text=frame_text)
+    messagebox.showinfo("Success", f"QR code saved as '{filename}'")
 
-if __name__ == "__main__":
-    main()
+def browse_logo():
+    logo_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif")])
+    if logo_path:
+        logo_path_entry.delete(0, tk.END)
+        logo_path_entry.insert(0, logo_path)
+
+def choose_fill_color():
+    color = colorchooser.askcolor()[1]
+    if color:
+        fill_color_entry.delete(0, tk.END)
+        fill_color_entry.insert(0, color)
+
+def choose_back_color():
+    color = colorchooser.askcolor()[1]
+    if color:
+        back_color_entry.delete(0, tk.END)
+        back_color_entry.insert(0, color)
+
+root = tk.Tk()
+root.title("QR Code Generator")
+
+tk.Label(root, text="URL (*):").grid(row=0, column=0, sticky=tk.W)
+url_entry = tk.Entry(root, width=50)
+url_entry.grid(row=0, column=1, columnspan=2, padx=5, pady=5)
+url_entry.insert(0, "https://example.com")
+
+tk.Label(root, text="Fill Color (*):").grid(row=1, column=0, sticky=tk.W)
+fill_color_entry = tk.Entry(root)
+fill_color_entry.grid(row=1, column=1, padx=5, pady=5)
+fill_color_entry.insert(0, "black")
+tk.Button(root, text="Choose", command=choose_fill_color).grid(row=1, column=2, padx=5, pady=5)
+
+tk.Label(root, text="Background Color (*):").grid(row=2, column=0, sticky=tk.W)
+back_color_entry = tk.Entry(root)
+back_color_entry.grid(row=2, column=1, padx=5, pady=5)
+back_color_entry.insert(0, "white")
+tk.Button(root, text="Choose", command=choose_back_color).grid(row=2, column=2, padx=5, pady=5)
+
+tk.Label(root, text="Filename (*):").grid(row=3, column=0, sticky=tk.W)
+filename_entry = tk.Entry(root)
+filename_entry.grid(row=3, column=1, columnspan=2, padx=5, pady=5)
+filename_entry.insert(0, "qr_code.png")
+
+tk.Label(root, text="Version:").grid(row=4, column=0, sticky=tk.W)
+version_entry = tk.Entry(root)
+version_entry.grid(row=4, column=1, columnspan=2, padx=5, pady=5)
+version_entry.insert(0, "1")
+
+tk.Label(root, text="Error Correction Level:").grid(row=5, column=0, sticky=tk.W)
+error_correction_entry = ttk.Combobox(root, values=["L", "M", "Q", "H"])
+error_correction_entry.grid(row=5, column=1, columnspan=2, padx=5, pady=5)
+error_correction_entry.set("L")
+
+tk.Label(root, text="Logo Path:").grid(row=6, column=0, sticky=tk.W)
+logo_path_entry = tk.Entry(root)
+logo_path_entry.grid(row=6, column=1, padx=5, pady=5)
+tk.Button(root, text="Browse", command=browse_logo).grid(row=6, column=2, padx=5, pady=5)
+
+tk.Label(root, text="Output Format:").grid(row=7, column=0, sticky=tk.W)
+output_format_entry = ttk.Combobox(root, values=["PNG", "JPEG"])
+output_format_entry.grid(row=7, column=1, columnspan=2, padx=5, pady=5)
+output_format_entry.set("PNG")
+
+tk.Label(root, text="Frame Text:").grid(row=8, column=0, sticky=tk.W)
+frame_text_entry = tk.Entry(root)
+frame_text_entry.grid(row=8, column=1, columnspan=2, padx=5, pady=5)
+
+tk.Button(root, text="Generate QR Code", command=generate_qr_code).grid(row=9, column=0, columnspan=3, pady=10)
+
+root.mainloop()
