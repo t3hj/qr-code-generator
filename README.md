@@ -50,3 +50,13 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 ## License 📄
 
 This project is licensed under the MIT License.
+
+
+## Browser edition
+
+Try the browser demo: https://t3hj.github.io/portfolio-website/demos/qr-code-generator/
+
+The `web/` folder is a static browser adaptation for text/URL encoding, colour selection, error correction and PNG export. It runs locally in the browser using a vendored MIT-licensed encoder; content is not sent to a QR service. The original Python implementation retains logo and frame functionality.
+
+Serve `web/` using a static web server for local preview. The hosted release is deployed through the portfolio's GitHub Pages site.
+
